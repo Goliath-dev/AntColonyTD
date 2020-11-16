@@ -28,7 +28,7 @@ public static class AntColonyAlgorithm
                     {
                         edge.Pheromone += 1;
                     }
-                    ant.Path.Clear();
+                    ant.ClearPath();
                 }
             }
             if (i % 2 == 0) DryPheromones(map.UnderlyingGraph.Edges);

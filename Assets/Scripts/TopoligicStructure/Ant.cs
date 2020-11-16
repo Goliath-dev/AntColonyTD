@@ -2,12 +2,34 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+public class AntDiedArgs 
+{
+    public Ant AntArg { get; }
 
+    public AntDiedArgs(Ant ant)
+    {
+        AntArg = ant;
+    }
+}
 public class Ant 
 {
     public Node CurrentNode { get; set; }
+    public Node PrevNode { get; set; }
+
+    private List<Edge> path = new List<Edge>();
+    public IEnumerable<Edge> Path
+    {
+        get
+        {
+            return path;
+        }
+    }
+
+    private AntDiedArgs antArgs;
+    public event EventHandler<AntDiedArgs> AntDied;
+
     private int health = 0;
-    public int Health 
+    public int Health
     {
         get
         {
@@ -26,20 +48,11 @@ public class Ant
             }
         }
     }
-
-    private void Die()
-    {
-        throw new NotImplementedException();
-    }
-
-    public Node PrevNode { get; set; }
-    private int CurrentPosOnEdge { get; set; } = 1; 
+    private int CurrentPosOnEdge { get; set; } = 1;
     private Edge CurrentEdge { get; set; }
-
-    public List<Edge> Path = new List<Edge>();
-
     public Ant(Node currentNode, int healthPoint)
     {
+        antArgs = new AntDiedArgs(this);
         CurrentNode = currentNode;
         Health = healthPoint;
     }
@@ -57,6 +70,11 @@ public class Ant
         }
         MoveAlong(CurrentEdge);
     }
+
+    public void ClearPath()
+    {
+        path.Clear();
+    }
     private void MoveAlong(Edge edge)
     {
         if (CurrentPosOnEdge != edge.Weight)
@@ -67,7 +85,7 @@ public class Ant
         {
             PrevNode = CurrentNode;
             CurrentNode = edge.NodeTo;
-            Path.Add(edge);
+            path.Add(edge);
             CurrentPosOnEdge = 1;
         }
     }
@@ -84,5 +102,10 @@ public class Ant
         var rand = AntColonyAlgorithm.Rand.Next(0, accumulatedPheromones.Last());
         var edgesAndPheromones = Enumerable.Zip(edges, accumulatedPheromones, (edge, ph) => new Tuple<Edge, int>(edge, ph));
         return (from edgePh in edgesAndPheromones where edgePh.Item2 > rand select edgePh.Item1).FirstOrDefault();
+    }
+
+    private void Die()
+    {
+        AntDied?.Invoke(this, antArgs);
     }
 }
