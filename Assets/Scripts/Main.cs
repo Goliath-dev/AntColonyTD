@@ -54,14 +54,17 @@ public class Main : MonoBehaviour
         node6.AddNeighbour(node8, 10, 1);
         node1.AddNeighbour(node8, 16, 1);
 
-        var nodes = new List<Node>(4) { node0, node1, node2, node3, node4, node5 };
+        var nodes = new List<Node>(8) { node0, node1, node2, node3, node4, node5, node6, node7 };
         var finalNode = node3;
 
         var graph = new Graph(nodes);
 
         GameMap map = new GameMap(graph, nodes[0], finalNode);
 
-        TwoDimGameMap map2 = new TwoDimGameMap(map);
+        var fncs = new GraphToSpaceFunctions();
+        TwoDimGameMap map2 = fncs.GameMapToSpace(map);
+        //foreach (var edge in map2.graph.Edges) UnityEngine.Debug.Log(edge);
+        foreach (var edge in graph.Edges) UnityEngine.Debug.Log(fncs.EdgeToSpace(edge));
         //var path = AntColonyAlgorithm.Algorithm(map);
         ////map.UnderlyingGraph.Edges.ToList().ForEach(ed => print(ed + " " + ed.Pheromone));
         //for (int i = 0; i < path.Count; i++)
