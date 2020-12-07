@@ -59,20 +59,45 @@ public class UnityGameMap : MonoBehaviour
     {
         foreach (var edge in tdMap.graph.Edges)
         {
-            for (int i = 0; i < edge.Path.Count() - 1; i++) //Not a typo, we don't need the last point.
-            {
-                var currPoint = new Vector2(edge.Path.ElementAt(i).X, edge.Path.ElementAt(i).Y);
-                var nextPoint = new Vector2(edge.Path.ElementAt(i + 1).X, edge.Path.ElementAt(i + 1).Y);
-                var diff = nextPoint - currPoint;
-                //TODO: Bugged a bit, gotta check the order of the first/last points appearance.
-                for (int j = 0; j < diff.magnitude; j++)
-                {
-                    var pos = currPoint + j * diff.normalized;
-                    var newEl = Instantiate(pathElPrefab, new Vector3(pos.x, pos.y), Quaternion.identity);
-                    newEl.SetActive(true);
-                    newEl.transform.SetParent(gameMapRoot);
-                }
-            }    
+            DrawEdge(pathElPrefab, edge, gameMapRoot);
+        }
+        foreach (var node in tdMap.graph.Nodes)
+        {
+            DrawElementOfPath(pathElPrefab, new Vector3(node.X, node.Y, 0), Color.green, gameMapRoot);
         }
     }
+
+    private GameObject DrawElementOfPath(GameObject prefab, Vector3 pos, Transform parent = null)
+    {
+        var el = Instantiate(prefab, pos, Quaternion.identity);
+        el.SetActive(true);
+        if (parent != null) el.transform.SetParent(parent);
+        return el;
+    }
+
+    private GameObject DrawElementOfPath(GameObject prefab, Vector3 pos, Color color, Transform parent = null)
+    {
+        var el = DrawElementOfPath(prefab, pos, parent);
+        el.GetComponent<Renderer>().material.color = color;
+        return el;
+    }
+
+    //Probably better return IEnumerable or so rather than void. 
+    private void DrawEdge(GameObject prefab, TwoDimEdge edge, Transform parent = null)
+    {
+        for (int i = 0; i < edge.Path.Count() - 1; i++) //Not a typo, we don't need the last point.
+        {
+            var currPoint = new Vector2(edge.Path.ElementAt(i).X, edge.Path.ElementAt(i).Y);
+            var nextPoint = new Vector2(edge.Path.ElementAt(i + 1).X, edge.Path.ElementAt(i + 1).Y);
+            var diff = nextPoint - currPoint;
+            for (int j = 0; j < diff.magnitude; j++)
+            {
+                if (!(j == 0 && i == 0)) //Except the first point of the edge, which is a node and drawn separately.
+                {
+                    var pos = currPoint + j * diff.normalized;
+                    _ = DrawElementOfPath(prefab, pos, parent);
+                }
+            }
+        }
+    }    
 }
