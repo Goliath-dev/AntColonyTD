@@ -47,6 +47,7 @@ public class UnityGameMap : MonoBehaviour
         var fncs = new GraphToSpaceFunctions();
         TDMap = fncs.GameMapToSpace(map);
         CreateGameMap(TDMap, PathEl, GameMapRoot);
+        //foreach (var edge in TDMap.graph.Edges) Debug.Log(edge);
     }
 
     // Update is called once per frame
@@ -95,6 +96,7 @@ public class UnityGameMap : MonoBehaviour
                 if (!(j == 0 && i == 0)) //Except the first point of the edge, which is a node and drawn separately.
                 {
                     var pos = currPoint + j * diff.normalized;
+                    //Debug.Log($"{currPoint} - {nextPoint} - {diff}");
                     _ = DrawElementOfPath(prefab, pos, parent);
                 }
             }

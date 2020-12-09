@@ -68,7 +68,7 @@ public class GraphToSpaceFunctions
                where first.NodeTo == second.NodeTo
                select (first, second)).FirstOrDefault();
     }
-    private TwoDimEdge CreateMidEdges(Edge firstEdge, Edge secondEdge)
+    private TwoDimEdge CreateMidEdges(Edge firstEdge, Edge secondEdge) 
     {
         var firstTwoDimNode = new TwoDimPoint(firstEdge.Weight, 0);
         var secondTwoDimNode = new TwoDimPoint(0, secondEdge.Weight);
@@ -100,11 +100,12 @@ public class GraphToSpaceFunctions
             var secondEdgeRatio = (float)(edges.second.Weight) / (edges.first.Weight + edges.second.Weight);
             var midPointCoord1 = Convert.ToInt32(firstEdgeRatio * firstEdge.Weight);
             var midPointCoord2 = Convert.ToInt32(secondEdgeRatio * secondEdge.Weight);
-            var commonNode = new TwoDimPoint(firstEdge.Weight - midPointCoord1, secondEdge.Weight - midPointCoord2);
+            var commonNode = new TwoDimPoint(midPointCoord1, midPointCoord2);
             var commonEdge = new TwoDimEdge(firstTwoDimNode, commonNode);
             //The edges is supposed to be 'folded' in the specific location, so calculate the number of creases. 
-            var creaseCount = (edges.first.Weight - 2 * (secondEdge.Weight - midPointCoord2)) /
-            (3 * (secondEdge.Weight - midPointCoord2 - 2) + 2); //Wrong formula! 
+            var creaseCount = (edges.first.Weight - midPointCoord2 - 1) / (2 * (midPointCoord2 - 1));
+            var creaseHeight = midPointCoord2 - 2;
+            Debug.Log(creaseCount);
             //Geometrically, an edge is a polygonal chain consisted of three parts: Г-shape part at the beginning, 
             //several creases in the middle and ⌋-shape part at the end. 
             //The first part.
